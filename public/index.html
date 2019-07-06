@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="scripts/semantic-ui-css/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
     <title>Single Page App Demo</title>
   </head>
   <body>
@@ -44,6 +45,41 @@
       <script id="rates-template" type="text/x-handlebars-template">
         <h1 class="ui header">Currency Rates</h1>
         <hr>
+        <div class="ui loading basic segment">
+          <div class="ui horizontal list flex">
+            <div class="item flex">
+              <i class="calendar alternate outline icon icon-align"></i>
+              <div class="content">
+                <div class="ui sub header">Date</div>
+                <span>{{date}}</span>
+              </div>
+            </div>
+            <div class="item flex">
+              <i class="money bill alternate outline icon icon-align"></i>
+              <div class="content">
+                <div class="ui sub header">Base</div>
+                <span>{{base}}</span>
+              </div>
+            </div>
+          </div>
+
+          <table class="ui celled striped selectable inverted table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each rates}}
+              <tr>
+                <td>{{@key}}</td>
+                <td>{{this}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
       </script>
 
       <!-- Exchange Conversion Template -->
