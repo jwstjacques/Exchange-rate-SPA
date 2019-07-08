@@ -1,7 +1,8 @@
 require('dotenv').config(); // read .env files
 const express = require('express');
 
-const { getRates } = require('./lib/fixer-service');
+const { getRates, getSymbols } = require('./lib/fixer-service');
+const { convertCurrency } = require('./lib/free-currency-service');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -45,6 +46,29 @@ app.get('/api/rates', async (req, res) => {
   }
 });
 
+// Fetch Symbols
+app.get('/api/symbols', async (req, res) => {
+  try {
+    const data = await getSymbols();
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+});
+
+// Convert Currency
+app.post('/api/convert', async (req, res) => {
+  try {
+    const { from, to } = req.body;
+    const data = await convertCurrency(from, to);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+});
+
 // Redirect all traffic to index.html
 app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
 
@@ -58,4 +82,16 @@ app.listen(port, () => {
 //   console.log(data);
 // };
 
-// test();
+// Test Symbols Endpoint
+// const test = async () => {
+//   const data = await getSymbols();
+//   console.log(data);
+// };
+
+// // Test Currency Conversion Endpoint
+// const test = async () => {
+//   const data = await convertCurrency('USD', 'KES');
+//   console.log(data);
+// };
+
+test();
