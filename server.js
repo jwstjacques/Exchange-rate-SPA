@@ -1,7 +1,13 @@
 require('dotenv').config(); // read .env files
+
+const bodyParser = require('body-parser');
 const express = require('express');
 
-const { getRates, getSymbols } = require('./lib/fixer-service');
+const {
+  getRates,
+  getSymbols,
+  getHistoricalRate
+} = require('./lib/fixer-service');
 const { convertCurrency } = require('./lib/free-currency-service');
 
 const app = express();
@@ -12,6 +18,18 @@ app.use(express.static('public'));
 
 // Allow front-end access to node_modules folder
 app.use('/scripts', express.static(`${__dirname}/node_modules/`));
+
+/** Place this code right before the error handler function **/
+
+// Parse POST data as URL encoded data
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+);
+
+// Parse POST data as JSON
+app.use(bodyParser.json());
 
 // Express Error handler
 const errorHandler = (err, req, res) => {
@@ -69,6 +87,18 @@ app.post('/api/convert', async (req, res) => {
   }
 });
 
+// Fetch Currency Rates by date
+app.post('/api/historical', async (req, res) => {
+  try {
+    const { date } = req.body;
+    const data = await getHistoricalRate(date);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  } catch (error) {
+    errorHandler(error, req, res);
+  }
+});
+
 // Redirect all traffic to index.html
 app.use((req, res) => res.sendFile(`${__dirname}/public/index.html`));
 
@@ -91,6 +121,12 @@ app.listen(port, () => {
 // // Test Currency Conversion Endpoint
 // const test = async () => {
 //   const data = await convertCurrency('USD', 'KES');
+//   console.log(data);
+// };
+
+// // Test Historical Rate endpoint
+// const test = async () => {
+//   const data = await getHistoricalRate('2019-01-13');
 //   console.log(data);
 // };
 
